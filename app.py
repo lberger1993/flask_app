@@ -1,40 +1,21 @@
 import os, time
 from flask import Flask, render_template, json, request, Response,jsonify
-from flask.ext.mysql import MySQL
-from mongoengine import connect
-from flask.ext.mongoengine import MongoEngine
 from geojson import Point, Feature, FeatureCollection
 from werkzeug import generate_password_hash, check_password_hash
+from database import init_db
+from flask.ext.pymongo import PyMongo
 
-app = Flask(__name__)
-
-mysql = MySQL()
-
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'Happy24Fish'
-app.config['MYSQL_DATABASE_DB'] = 'BucketList'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
-
-app.config['SECRET_KEY']='\x17b\x89\xae\x8bO\x99.Z\xbc\xb0\x05<M\x86\xb9\xb5\x1a\x89\xd2\x92\xa0\xaaR'
 
 #----------------------------------------
 # database
 #----------------------------------------
 
-DB_NAME = 'arctic-help'
-DB_USERNAME = 'luciaberger'
-DB_PASSWORD = 'Happy24Fish'
-DB_HOST_ADDRESS = 'ds145128.mlab.com:45128/arctic-help'
-
-app.config["MONGODB_DB"] = DB_NAME
-connect(DB_NAME, host='mongodb://' + DB_USERNAME + ':' + DB_PASSWORD + '@' + DB_HOST_ADDRESS)
-db = MongoEngine(app)
-print(db)
-
+app = Flask(__name__)
+app.config['MONGO_DBNAME'] = 'arctic-help'
+app.config['MONGO_URI'] = 'mongodb://luciaberger:Happy24Fish@ds145128.mlab.com:45128/arctic-help'
+mongo = PyMongo(app)
 
 ACCESS_KEY = os.environ.get('pk.eyJ1IjoibHVjaWFiZXJnZXIiLCJhIjoiY2l4NHE1eHFkMDFpMDJ5b3d2OTVwMTVjdyJ9.WYhHRi5M6jOMpqR2kBXy-g')
-
 
 @app.route("/")
 def hello():
@@ -44,13 +25,25 @@ def hello():
 def showSignUp():
     return render_template('signup.html')
 
+@app.route('/add')
+def add():
+    user = mongo.db.users
+    user.insert({'name' : 'Alex'})
+    return 'Added users'
+
 @app.route('/showChart')
 def showChart():
+    locations = mongo.db.locations.find
+    print(locations)
     return render_template('chart.html', ACCESS_KEY=ACCESS_KEY)
 
 @app.route('/showTorontoChart')
 def showTorontoChart():
     return render_template('torontochart.html', ACCESS_KEY=ACCESS_KEY)
+
+@app.route('/showVanChart')
+def showVanChart():
+    return render_template('vancouverchart.html', ACCESS_KEY=ACCESS_KEY)
 
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
@@ -61,29 +54,14 @@ def signUp():
 
         # validate the received values
         if _name and _email and _password:
-            
-            # All Good, let's call MySQL
-            
-            conn = mysql.connect()
-            cursor = conn.cursor()
-            _hashed_password = generate_password_hash(_password)
-            print(_hashed_password)
-            cursor.callproc('sp_createUser',(_name,_email,_hashed_password[0:6]))
-            data = cursor.fetchall()
-
-            if len(data) is 0:
-                conn.commit()
-                return json.dumps({'message':'User created successfully !'})
-            else:
-                return json.dumps({'error':str(data[0])})
-        else:
-            return json.dumps({'html':'<span>Enter the required fields</span>'})
+            user = mongo.db.users
+            user.insert({'name' : _name, 'email': _email, 'password': _password})
+            #return render_template('torontochart.html', ACCESS_KEY=ACCESS_KEY)
 
     except Exception as e:
         return json.dumps({'error':str(e)})
     finally:
-        cursor.close() 
-        conn.close()
+        print("EEORRRR")
 
 @app.route('/getChartData',methods=['GET'])
 def getChartData():

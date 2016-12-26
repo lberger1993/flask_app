@@ -38,3 +38,7 @@ body {
   border-top-right-radius: 0;
 }
 #mapid { height: 380px; }
+#open{background-color: #4183D7; 
+  border:#4183D7 1px solid !important;
+  width:40%;
+}
