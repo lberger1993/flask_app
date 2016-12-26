@@ -2,64 +2,83 @@
 <html lang="en">
   <head>
     <title>Python Flask Bucket List App</title>
- 
-    
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
- 
-    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
-    <link href="../static/signup.css" rel="stylesheet">
+<!--     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+ -->
     <script src="../static/js/jQuery.js"></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.2.3/mapbox.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.2.3/mapbox.js'></script>
+    <style>
+        #map { width: 100%; height: 400px; }
+    </style>
   </head>
   <body>
     <div class="container">
-      <div class="header">
-        <nav>
-          <ul class="nav nav-pills pull-right">
-            <li role="presentation" ><a href="/">Home</a></li>
-            <li role="presentation" class="active"><a href="showChart">Chart</a></li>
-            <li role="presentation"><a href="showSignUp">Sign Up</a></li>
-          </ul>
-        </nav>
-        <h3 class="text-muted">Python Flask App</h3>
-      </div>
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation""><a href="/">Home</a>
+                    </li>
+                    <li role="presentation" class="active"><a href="showChart">Add Sources</a>
+                    </li>
+                    <li role="presentation"><a href="showSignUp">Sign Up</a>
+                    </li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">Python Flask App</h3>
+        </div>
  
-       {{googlemap("my_awesome_map", lat=45.5017, lng=-73.56725599999999)}}
-     <!--  <div class="jumbotron">
-        <h1>Bucket List App</h1>
-        <form class="form-signin">
-        <label for="inputName" class="sr-only">Name</label>
-        <input type="name" name="inputName" id="inputName" class="form-control" placeholder="Name" required autofocus>
-        <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Password" required>
-         
-        <button id="btnSignUp" class="btn btn-lg btn-primary btn-block" type="button">Sign up</button>
-      </form>
-      </div>
-  -->
-       
+        <div class="jumbotron">
+            <h1>Bucket List App</h1>
+            <p class="lead"></p>
+        </div>
+        <div class="row marketing">
+            <div class="col-lg-6">
+                <div id="log">
+                </div>
+              <div id="map">
+                </div>
+        </div>
+            <div class="col-lg-6">
+                <h4>Bucket List</h4>
+                <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
  
-      <footer class="footer">
-        <p>&copy; Company 2015</p>
-      </footer>
-  
-    </div>
-  </body>
-<!-- il faut le bouger -->
-<script>
-  $(function() {
-    $('#btnSignUp').click(function() {
-        $.ajax({
-            url: '/getChartData',
-            type: 'GET',
-            success: function(response) {
-                console.log(response);
-            },
-            error: function(error) {
-                console.log(error);
-            }
+                <h4>Bucket List</h4>
+                <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+ 
+                <h4>Bucket List</h4>
+                <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+            </div>
+        </div>
+      </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script>
+
+    $('.submit').click(function() {
+      var source = new EventSource('/process');
+      source.onopen = function(){
+        console.log('connection is opened.' + source.readyState);  
+      };
+      
+      source.onmessage = function(event) {
+        var message = $('#log').html();
+        $('#log').html(message + event.data);
+      };
+      source.onerror = function(e) {
+        source.close();
+        $.get('/result', function(response) {
+          var myLayer = L.mapbox.featureLayer().addTo(map);
+          myLayer.setGeoJSON(response.result);
         });
+        alert('You should see a maker dropped on the map now');
+      };
     });
-});
+    L.mapbox.accessToken = 'pk.eyJ1IjoibHVjaWFiZXJnZXIiLCJhIjoiY2l4NHE1eHFkMDFpMDJ5b3d2OTVwMTVjdyJ9.WYhHRi5M6jOMpqR2kBXy-g';
+    var map = L.mapbox.map('map', 'mapbox.streets', {
+      scrollWheelZoom: false
+    }).setView([45.5016889,-73.56725599999999], 14);
+
 </script>
+</body>
+</html>

@@ -1,7 +1,8 @@
-from flask import Flask, render_template, json, request
+import os, time
+from flask import Flask, render_template, json, request, Response,jsonify
 from flask.ext.mysql import MySQL
+from geojson import Point, Feature, FeatureCollection
 from werkzeug import generate_password_hash, check_password_hash
-from flask_googlemaps import GoogleMaps
 
 app = Flask(__name__)
 
@@ -13,7 +14,8 @@ app.config['MYSQL_DATABASE_DB'] = 'BucketList'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
-GoogleMaps(app, key="AIzaSyAEM0Xwkw_xhZFEmpo2mVKSM7h3fKdCRFM")
+
+ACCESS_KEY = os.environ.get('pk.eyJ1IjoibHVjaWFiZXJnZXIiLCJhIjoiY2l4NHE1eHFkMDFpMDJ5b3d2OTVwMTVjdyJ9.WYhHRi5M6jOMpqR2kBXy-g')
 
 
 @app.route("/")
@@ -26,7 +28,7 @@ def showSignUp():
 
 @app.route('/showChart')
 def showChart():
-    return render_template('chart.html')
+    return render_template('chart.html', ACCESS_KEY=ACCESS_KEY)
 
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
@@ -65,5 +67,24 @@ def signUp():
 def getChartData():
     print("I get here")
 
+@app.route('/')
+def index():
+    return render_template('index.html', ACCESS_KEY=ACCESS_KEY)
+
+@app.route('/result')
+def process():
+    point = Point((-77.0366048812866, 38.89784666877921))
+    feature = Feature(geometry=point)
+    feature_collection = FeatureCollection([feature])
+    return jsonify(result=feature_collection)
+
+@app.route('/process')
+def long_running_process():
+      def generate():
+        for row in range(1, 10):
+            yield 'data: Processing \n\n'
+            time.sleep(2)
+      return Response(generate(), mimetype='text/event-stream')  
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(threaded=True)

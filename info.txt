@@ -1,1 +1,5 @@
 MSQL password: root@localhost: mCP<ps!Pk10a
+flask
+gunicorn
+geojson
+
