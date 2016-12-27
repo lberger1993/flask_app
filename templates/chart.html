@@ -31,7 +31,7 @@
           <h1>Find Centers</h1>
           <div class="header">
             <nav>
-                <ul class="nav nav-pills pull-left">
+                <ul class="nav nav-pills pull-left"> {{ IS_VERIFIED }}
                     <li role="presentation" class="active"><a href="showChart">Montreal</a>
                     </li>
                     <li role="presentation"><a href="showTorontoChart">Toronto</a>
@@ -88,6 +88,7 @@
         $.get('/result', function(response) {
           var myLayer = L.mapbox.featureLayer().addTo(map);
           myLayer.setGeoJSON(response.result);
+          console.log(response.result);
         });
         alert('You should see a maker dropped on the map now');
       };
@@ -96,6 +97,10 @@
     var map = L.mapbox.map('map', 'mapbox.streets', {
       scrollWheelZoom: false
     }).setView([45.5016889,-73.56725599999999], 14);
+    var tmp = 
+
+    var myLayer = L.mapbox.featureLayer().addTo(map);
+    myLayer.setGeoJSON(response.result);
 
 </script>
 </body>

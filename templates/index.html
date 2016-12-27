@@ -1,14 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
 <!DOCTYPE html>
 <html lang="en">
- 
 <head>
     <title>Python Flask Bucket List App</title>
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
     <link href="../static/signup.css" rel="stylesheet">
-
 </head>
- 
 <body>
     <div class="container">
         <div class="header">
@@ -24,7 +23,6 @@
             </nav>
             <h3 class="text-muted">Arctic Help</h3> <h5>grassroots for the newly arrived </h5>
         </div>
- 
         <div class="jumbotron">
             <img src="/static/images/canada.svg" alt="Kiwi standing on oval" height="100px">
             <!-- <h5>Arctic Help </h5> -->
@@ -51,12 +49,11 @@
                 <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
             </div>
         </div>
- 
         <footer class="footer">
             <p>&copy; Company 2015</p>
         </footer>
  
     </div>
 </body>
- 
 </html>
+{% endblock %}
